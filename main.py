@@ -22,6 +22,15 @@ def hello():
 def balancepage():
     return 'This is the page for balances'
 
+@app.route('/get_quest_status')
+def get_quest_statusqstatus:
+    return 'This is a get quest status page'
+    
+@app.route('/update_quest_status')
+def uqstatus:
+    return 'This is an update quest status page'
+
+
 @app.route('/get_balance/<int:user_id>', methods=['GET'])
 def get_balance(user_id):
     # Fetch user balance from the database
@@ -32,6 +41,7 @@ def get_balance(user_id):
     response.headers.add("Access-Control-Allow-Origin", "https://ohsudden.github.io")
     response.headers.add("Access-Control-Allow-Headers", "Content-Type")
     return response
+
 
 BOT_TOKEN = '7386401380:AAGO96QtljKyPQ32bj85e4s_VznJAOpXLb8'
 

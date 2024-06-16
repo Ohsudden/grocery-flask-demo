@@ -33,3 +33,4 @@ def get_balance(uid):
     balance = result[0]
     logging.info(f'User {uid} balance: {balance}')
     return balance
+
