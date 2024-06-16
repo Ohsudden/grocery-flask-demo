@@ -3,7 +3,7 @@ from aiogram import Bot, Dispatcher, types
 import asyncio
 import logging
 from flask import Flask, jsonify
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import concurrent.futures
 
 import db
@@ -11,8 +11,8 @@ import db
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
+# Apply CORS to the entire Flask app
 CORS(app)
-CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.route('/')
 def hello():
@@ -23,12 +23,14 @@ def balancepage():
     return 'This is the page for balances'
 
 @app.route('/get_balance/<int:user_id>')
+@cross_origin(origin='https://ohsudden.github.io')
 def get_balance(user_id):
     # Fetch user balance from the database
     balance = db.get_balance(user_id) / 1e9  # Convert from nanoton to TON
     if balance is None:
         balance = 0
-    return jsonify({'balance': f'{balance:.2f}'})
+    response = jsonify({'balance': f'{balance:.2f}'})
+    return response
 
 BOT_TOKEN = '7386401380:AAGO96QtljKyPQ32bj85e4s_VznJAOpXLb8'
 
