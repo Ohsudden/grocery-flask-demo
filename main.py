@@ -12,6 +12,7 @@ logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.route('/')
 def hello():
@@ -21,7 +22,7 @@ def hello():
 def balancepage():
     return 'This is the page for balances'
 
-@app.route('/get_balance/<int:user_id>', methods=['GET'])
+@app.route('/get_balance/<int:user_id>')
 def get_balance(user_id):
     # Fetch user balance from the database
     balance = db.get_balance(user_id) / 1e9  # Convert from nanoton to TON
