@@ -1,9 +1,10 @@
 import aiogram
-from aiogram import Bot, Dispatcher, executor, types
+from aiogram import Bot, Dispatcher, types
 import asyncio
 import logging
 from flask import Flask, jsonify
 from flask_cors import CORS
+import concurrent.futures
 
 import db
 
@@ -11,6 +12,14 @@ logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 CORS(app)
+
+@app.route('/')
+def hello():
+    return 'Main page'
+
+@app.route('/get_balance')
+def balancepage():
+    return 'This is the page for balances'
 
 @app.route('/get_balance/<int:user_id>', methods=['GET'])
 def get_balance(user_id):
@@ -22,12 +31,18 @@ def get_balance(user_id):
 
 BOT_TOKEN = '7386401380:AAGO96QtljKyPQ32bj85e4s_VznJAOpXLb8'
 
-loop = asyncio.new_event_loop();
+loop = asyncio.new_event_loop()
 bot = Bot(BOT_TOKEN, parse_mode='HTML')
 dp = Dispatcher(bot, loop)
 
+async def start_polling():
+    from handlers import dp  # Ensure handlers are imported here
+    await dp.start_polling()
+
+def run_flask():
+    app.run(host='0.0.0.0', port=5000)
 
 if __name__ == "__main__":
-    from handlers import dp
-    executor.start_polling(dp)
-    app.run(host="0.0.0.0")
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        executor.submit(run_flask)
+        loop.run_until_complete(start_polling())
