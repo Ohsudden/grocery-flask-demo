@@ -51,10 +51,9 @@ def get_quest_status(user_id):
     response.headers.add("Access-Control-Allow-Headers", "Content-Type")
     return response
 
-@app.route('/update_quest_status', methods=['POST'])
-def update_quest_status():
+@app.route('/update_quest_status/<int:user_id>', methods=['POST'])
+def update_quest_status(user_id):
     data = request.json
-    user_id = data['user_id']
     quest_status = data['status']
     db.update_user_quest_status(user_id, quest_status)
     return jsonify({'success': True})
