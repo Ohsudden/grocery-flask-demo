@@ -23,11 +23,11 @@ def balancepage():
     return 'This is the page for balances'
 
 @app.route('/get_quest_status')
-def get_quest_statusqstatus:
+def qstatus():
     return 'This is a get quest status page'
     
 @app.route('/update_quest_status')
-def uqstatus:
+def uqstatus():
     return 'This is an update quest status page'
 
 
@@ -41,6 +41,23 @@ def get_balance(user_id):
     response.headers.add("Access-Control-Allow-Origin", "https://ohsudden.github.io")
     response.headers.add("Access-Control-Allow-Headers", "Content-Type")
     return response
+
+
+@app.route('/get_quest_status/<int:user_id>', methods=['GET'])
+def get_quest_status(user_id):
+    status = db.get_user_quest_status(user_id)
+    response = jsonify({'status': status})
+    response.headers.add("Access-Control-Allow-Origin", "https://ohsudden.github.io")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type")
+    return response
+
+@app.route('/update_quest_status', methods=['POST'])
+def update_quest_status():
+    data = request.json
+    user_id = data['user_id']
+    quest_status = data['status']
+    db.update_user_quest_status(user_id, quest_status)
+    return jsonify({'success': True})
 
 
 BOT_TOKEN = '7386401380:AAGO96QtljKyPQ32bj85e4s_VznJAOpXLb8'

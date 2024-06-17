@@ -10,6 +10,22 @@ cur.execute('''CREATE TABLE IF NOT EXISTS Users (
             )''')
 con.commit()
 
+cur.execute('''CREATE TABLE IF NOT EXISTS Tasks (
+                idofTask INTEGER PRIMARY KEY,
+                description VARCHAR(50)
+            )''')
+con.commit()
+
+cur.execute('''CREATE TABLE IF NOT EXISTS UsersAndTasks (
+                uid INTEGER,
+                idofTask INTEGER,
+                status TEXT DEFAULT 'none',
+                PRIMARY KEY(uid, idofTask),
+                FOREIGN KEY(uid) REFERENCES Users(uid) ON DELETE CASCADE,
+                FOREIGN KEY(idofTask) REFERENCES Tasks(idofTask) ON DELETE CASCADE
+            )''')
+con.commit()
+
 def add_user(uid):
     # new user always has balance = 0
     cur.execute('INSERT INTO Users (uid) VALUES (?)', (uid,))
@@ -34,3 +50,29 @@ def get_balance(uid):
     logging.info(f'User {uid} balance: {balance}')
     return balance
 
+tasks = [
+    (1, 'Натиснути на кнопку додати 3 рази'),
+    (2, 'Під\'єднати криптогаманець'),
+    (3, 'Увійти до аккаунту')
+]
+
+cur.executemany('INSERT OR IGNORE INTO Tasks (idofTask, description) VALUES (?, ?)', tasks)
+con.commit()
+
+#cur.execute('SELECT * FROM Tasks')
+#all_tasks = cur.fetchall()
+#for task in all_tasks:
+#    print(task)
+
+#con.close()
+
+def get_user_quest_status(uid):
+    cur.execute('SELECT status FROM UsersAndTasks WHERE uid = ?', (uid,))
+    result = cur.fetchone()
+    if result is None:
+        return {}
+    return result[0]
+
+def update_user_quest_status(uid, status):
+    cur.execute('REPLACE INTO UsersAndTasks (uid, status) VALUES (?, ?)', (uid, status))
+    con.commit()
