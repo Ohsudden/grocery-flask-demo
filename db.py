@@ -76,3 +76,13 @@ def get_user_quest_status(uid):
 def update_user_quest_status(uid, status):
     cur.execute('REPLACE INTO UsersAndTasks (uid, status) VALUES (?, ?)', (uid, status))
     con.commit()
+
+def user_exists(uid):
+    cur.execute('SELECT 1 FROM Users WHERE uid = ?', (uid,))
+    return cur.fetchone() is not None
+
+def add_new_user(uid):
+    cur.execute('INSERT INTO Users (uid, balance) VALUES (?, ?)', (uid, 0))
+    initial_status = json.dumps({"addClicks": False, "connectWallet": False, "login": False})
+    cur.execute('INSERT INTO UsersAndTasks (uid, status) VALUES (?, ?)', (uid, initial_status))
+    con.commit()

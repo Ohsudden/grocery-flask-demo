@@ -30,6 +30,21 @@ def qstatus():
 def uqstatus():
     return 'This is an update quest status page'
 
+@app.route('/login')
+def ulogin():
+    return 'This is a login page']
+
+
+@app.route('/login/<int:user_id>', methods=['POST'])
+def login():
+    data = request.json
+    user_id = data['user_id']
+    
+    if not db.user_exists(user_id):
+        db.add_new_user(user_id)
+    
+    return jsonify({'success': True})
+
 
 @app.route('/get_balance/<int:user_id>', methods=['GET'])
 def get_balance(user_id):
