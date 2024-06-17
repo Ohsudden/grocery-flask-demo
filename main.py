@@ -32,7 +32,7 @@ def uqstatus():
 
 @app.route('/login')
 def ulogin():
-    return 'This is a login page']
+    return 'This is a login page'
 
 
 @app.route('/login/<int:user_id>', methods=['POST'])
