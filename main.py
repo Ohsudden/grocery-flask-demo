@@ -59,11 +59,8 @@ def get_balance(user_id):
 
 @app.route('/get_quest_status/<int:user_id>', methods=['GET'])
 def get_quest_status(user_id):
-    status = db.get_user_quest_status(user_id)
-    response = jsonify({'status': status})
-    response.headers.add("Access-Control-Allow-Origin", "https://ohsudden.github.io")
-    response.headers.add("Access-Control-Allow-Headers", "Content-Type")
-    return response
+    status_list = db.get_user_quest_status(user_id)
+    return jsonify({'status': status_list})
 
 @app.route('/update_quest_status/<int:user_id>', methods=['GET', 'POST'])
 def update_quest_status(user_id):

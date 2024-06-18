@@ -28,11 +28,11 @@ con.commit()
 
 def add_user(uid):
     # new user always has balance = 0
-    cur.execute('INSERT INTO Users (uid) VALUES (?, ?)', (uid, 0))
+    cur.execute('INSERT INTO Users (uid) VALUES (?)', (uid,))
     con.commit()
 
 def check_user(uid):
-    cur.execute('SELECT * FROM Users WHERE uid = ?', (uid))
+    cur.execute('SELECT * FROM Users WHERE uid = ?', (uid,))
     user = cur.fetchone()
     return bool(user)
 
@@ -41,7 +41,7 @@ def add_balance(uid, amount):
     con.commit()
 
 def get_balance(uid):
-    cur.execute('SELECT balance FROM Users WHERE uid = ?', (uid))
+    cur.execute('SELECT balance FROM Users WHERE uid = ?', (uid,))
     result = cur.fetchone()
     if result is None:
         logging.info(f'User {uid} not found in database. Returning balance: 0')
@@ -67,11 +67,12 @@ con.commit()
 #con.close()
 
 def get_user_quest_status(uid):
-    cur.execute('SELECT status FROM UsersAndTasks WHERE uid = ?', (uid,))
-    result = cur.fetchone()
-    if result is None:
-        return {}
-    return result[0]
+    cur.execute('SELECT idofTask, status FROM UsersAndTasks WHERE uid = ?', (uid,))
+    results = cur.fetchall()
+    if not results:
+        return []
+    status_list = [{'idofTask': task_id, 'status': status} for task_id, status in results]
+    return status_list
 
 def update_user_quest_status(uid, idofTask, status):
     cur.execute('REPLACE INTO UsersAndTasks (uid, idofTask, status) VALUES (?, ?, ?)', (uid, idofTask, status))
@@ -85,17 +86,3 @@ def add_new_user(uid):
     cur.execute('INSERT INTO UsersAndTasks (uid, idofTask, status) VALUES (?, ?, ?)', (uid, 2, initial_status))
     cur.execute('INSERT INTO UsersAndTasks (uid, idofTask, status) VALUES (?, ?, ?)', (uid, 3, initial_status))
     con.commit()
-
-def read_from_users():
-    cur.execute('SELECT * FROM Users')
-    data = cur.fetchall()
-    print(data)
-
-def read_from_TasksandUsers():
-    cur.execute('SELECT * FROM UsersAndTasks')
-    data = cur.fetchall()
-    print(data)
-
-read_from_TasksandUsers()
-
-read_from_users()
