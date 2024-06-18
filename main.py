@@ -2,7 +2,7 @@ import aiogram
 from aiogram import Bot, Dispatcher, types
 import asyncio
 import logging
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import concurrent.futures
 
@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 # Apply CORS to the entire Flask app
-CORS(app, resources={r"/get_balance/*": {"origins": "https://ohsudden.github.io"}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.route('/')
 def hello():
@@ -26,7 +26,7 @@ def balancepage():
 def qstatus():
     return 'This is a get quest status page'
     
-@app.route('/update_quest_status')
+@app.route('/update_quest_status', methods=['GET', 'POST'])
 def uqstatus():
     return 'This is an update quest status page'
 
@@ -35,15 +35,14 @@ def ulogin():
     return 'This is a login page'
 
 
-@app.route('/login/<int:user_id>', methods=['POST'])
-def login():
-    data = request.json
-    user_id = data['user_id']
-    
-    if not db.user_exists(user_id):
+@app.route('/login/<int:user_id>', methods=['GET'])
+def login(user_id):
+    if not db.check_user(user_id):
         db.add_new_user(user_id)
-    
-    return jsonify({'success': True})
+    response = jsonify({'success': True})
+    response.headers.add("Access-Control-Allow-Origin", "https://ohsudden.github.io")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type")
+    return response
 
 
 @app.route('/get_balance/<int:user_id>', methods=['GET'])
@@ -66,12 +65,16 @@ def get_quest_status(user_id):
     response.headers.add("Access-Control-Allow-Headers", "Content-Type")
     return response
 
-@app.route('/update_quest_status/<int:user_id>', methods=['POST'])
+@app.route('/update_quest_status/<int:user_id>', methods=['GET', 'POST'])
 def update_quest_status(user_id):
-    data = request.json
-    quest_status = data['status']
-    db.update_user_quest_status(user_id, quest_status)
-    return jsonify({'success': True})
+    if request.method == 'POST':
+        data = request.json
+        idofTask = data.get('idofTask')  # Get idofTask from the request data
+        quest_status = True
+        db.update_user_quest_status(user_id, idofTask, quest_status)
+        return jsonify({'success': True})
+    else:
+        return None
 
 
 BOT_TOKEN = '7386401380:AAGO96QtljKyPQ32bj85e4s_VznJAOpXLb8'

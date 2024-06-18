@@ -1,7 +1,7 @@
 import logging
 import sqlite3
 
-con = sqlite3.connect('db.sqlite', check_same_thread=False)
+con = sqlite3.connect('database.db', check_same_thread=False)
 cur = con.cursor()
 
 cur.execute('''CREATE TABLE IF NOT EXISTS Users (
@@ -28,11 +28,11 @@ con.commit()
 
 def add_user(uid):
     # new user always has balance = 0
-    cur.execute('INSERT INTO Users (uid) VALUES (?)', (uid,))
+    cur.execute('INSERT INTO Users (uid) VALUES (?, ?)', (uid, 0))
     con.commit()
 
 def check_user(uid):
-    cur.execute('SELECT * FROM Users WHERE uid = ?', (uid,))
+    cur.execute('SELECT * FROM Users WHERE uid = ?', (uid))
     user = cur.fetchone()
     return bool(user)
 
@@ -41,7 +41,7 @@ def add_balance(uid, amount):
     con.commit()
 
 def get_balance(uid):
-    cur.execute('SELECT balance FROM Users WHERE uid = ?', (uid,))
+    cur.execute('SELECT balance FROM Users WHERE uid = ?', (uid))
     result = cur.fetchone()
     if result is None:
         logging.info(f'User {uid} not found in database. Returning balance: 0')
@@ -73,16 +73,29 @@ def get_user_quest_status(uid):
         return {}
     return result[0]
 
-def update_user_quest_status(uid, status):
-    cur.execute('REPLACE INTO UsersAndTasks (uid, status) VALUES (?, ?)', (uid, status))
+def update_user_quest_status(uid, idofTask, status):
+    cur.execute('REPLACE INTO UsersAndTasks (uid, idofTask, status) VALUES (?, ?, ?)', (uid, idofTask, status))
     con.commit()
 
-def user_exists(uid):
-    cur.execute('SELECT 1 FROM Users WHERE uid = ?', (uid,))
-    return cur.fetchone() is not None
 
 def add_new_user(uid):
     cur.execute('INSERT INTO Users (uid, balance) VALUES (?, ?)', (uid, 0))
-    initial_status = json.dumps({"addClicks": False, "connectWallet": False, "login": False})
-    cur.execute('INSERT INTO UsersAndTasks (uid, status) VALUES (?, ?)', (uid, initial_status))
+    initial_status = False
+    cur.execute('INSERT INTO UsersAndTasks (uid, idofTask, status) VALUES (?, ?, ?)', (uid, 1, initial_status))
+    cur.execute('INSERT INTO UsersAndTasks (uid, idofTask, status) VALUES (?, ?, ?)', (uid, 2, initial_status))
+    cur.execute('INSERT INTO UsersAndTasks (uid, idofTask, status) VALUES (?, ?, ?)', (uid, 3, initial_status))
     con.commit()
+
+def read_from_users():
+    cur.execute('SELECT * FROM Users')
+    data = cur.fetchall()
+    print(data)
+
+def read_from_TasksandUsers():
+    cur.execute('SELECT * FROM UsersAndTasks')
+    data = cur.fetchall()
+    print(data)
+
+read_from_TasksandUsers()
+
+read_from_users()
