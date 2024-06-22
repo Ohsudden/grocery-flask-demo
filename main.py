@@ -83,7 +83,7 @@ dp = Dispatcher(bot, loop)
 async def start_polling():
     from handlers import dp  # Ensure handlers are imported here
     await dp.start_polling()
-
+ 
 def run_flask():
     app.run(host='0.0.0.0', port=5000)
 

@@ -30,6 +30,7 @@ def add_user(uid):
     # new user always has balance = 0
     cur.execute('INSERT INTO Users (uid) VALUES (?)', (uid,))
     con.commit()
+    
 
 def check_user(uid):
     cur.execute('SELECT * FROM Users WHERE uid = ?', (uid,))
